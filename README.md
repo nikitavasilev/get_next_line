@@ -4,7 +4,7 @@ Write a function that will store, in the parameter “line”, a line that has b
 
 ## Requirements
 
-- Your function must be prototyped as follows: `int get_next_line(int fd, char \*\*line);`
+- Your function must be prototyped as follows: `int get_next_line(int fd, char **line);`
 - Your function should be memory leak free.
 - What we call a “line that has been read” is a succession of 0 to n characters that end with ‘\n’ (ascii code 0x0a) or with End Of File (EOF).
 - The string stored in the parameter “line” should not contained any ‘\n’.
