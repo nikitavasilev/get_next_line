@@ -6,3 +6,26 @@ https://hps.vi4io.org/_media/teaching/wintersemester_2012_2013/epc-1213-brauer-b
 https://www.youtube.com/watch?v=mMcyXjxv6CU
 http://fort-knox.org/files/globstat.pdf
 https://harm-smits.github.io/42docs/projects/get_next_line.html
+
+ssize_t read(int fildes, void *buf, size_t nbyte);
+
+DESCRIPTION
+read() attempts to read nbyte bytes of data from the object referenced by the
+descriptor fildes into the buffer pointed to by buf.
+
+int fildes:
+The file descriptor of where to read the input.
+You can either use a file descriptor obtained from the open system call,
+or you can use 0, 1, or 2, to refer to standard input, standard output,
+or standard error, respectively.
+
+void *buf:
+A character array where the read content will be stored.
+
+size_t nbyte:
+The number of bytes to read before truncating the data.
+If the data to be read is smaller than nbytes, all data is saved in the buffer.
+
+RETURN VALUES:
+Returns the number of bytes that were read.
+If value is negative, then the system call returned an error.
