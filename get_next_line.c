@@ -6,7 +6,7 @@
 /*   By: nvasilev <nvasilev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 00:37:56 by nvasilev          #+#    #+#             */
-/*   Updated: 2021/01/10 20:22:55 by nvasilev         ###   ########.fr       */
+/*   Updated: 2021/01/12 15:27:39 by nvasilev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,19 +71,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-char	*ft_strnew(size_t size)
-{
-	char *str;
-
-	str = (char *)malloc(sizeof(char) * (size + 1));
-	if (str == NULL)
-		return (NULL);
-	while (size > 0)
-		str[size--] = '\0';
-	str[0] = '\0';
-	return (str);
-}
-
 char	*ft_strchr(const char *s, int c)
 {
 	while (*s)
@@ -109,7 +96,11 @@ int		get_next_line(int fd, char **line)
 	if (remainder)
 		*line = ft_strdup(remainder);
 	else
-		*line = ft_strnew(1);
+	{
+		if (!(*line = malloc(1)))
+			return (0);
+		line[0][0] = '\0';
+	}
 	while (flag && (byte_was_read = read(fd, buf, BUFFER_SIZE)))
 	{
 		if ((p_n = ft_strchr(buf, '\n')))
@@ -133,8 +124,8 @@ int		main(void)
 	fd = open("file.txt", O_RDONLY);
 	get_next_line(fd, &line);
 	printf("%s\n", line);
-//	get_next_line(fd, &line);
-//	printf("%s\n", line);
+	get_next_line(fd, &line);
+	printf("%s\n", line);
 
 	return (0);
 }
