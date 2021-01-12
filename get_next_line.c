@@ -6,7 +6,7 @@
 /*   By: nvasilev <nvasilev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 00:37:56 by nvasilev          #+#    #+#             */
-/*   Updated: 2021/01/12 15:56:12 by nvasilev         ###   ########.fr       */
+/*   Updated: 2021/01/12 17:27:44 by nvasilev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,8 @@ char	*ft_strchr(const char *s, int c)
 int		get_next_line(int fd, char **line)
 {
 	char	buf[BUFFER_SIZE + 1];
-	int		byte_was_read;
-	char	*p_n;
+	int		nb_bytes_read;
+	char	*p_newline;
 	int		is_newline;
 	static char *remainder;
 
@@ -101,20 +101,22 @@ int		get_next_line(int fd, char **line)
 			return (0);
 		line[0][0] = '\0';
 	}
-	printf("%s\n", remainder);
-	while (!is_newline && (byte_was_read = read(fd, buf, BUFFER_SIZE)))
+
+	while (!is_newline && (nb_bytes_read = read(fd, buf, BUFFER_SIZE)))
 	{
-		if ((p_n = ft_strchr(buf, '\n')))
+		if ((p_newline = ft_strchr(buf, '\n')))
 		{
-			*p_n = '\0';
+			*p_newline = '\0';
 			is_newline = 1;
-			p_n++;
-			remainder = ft_strdup(p_n);
+			p_newline++;
+			remainder = ft_strdup(p_newline);
 		}
-		buf[byte_was_read] = '\0';
+		buf[nb_bytes_read] = '\0';
 		*line = ft_strjoin(*line, buf);
 	}
-	printf("%d\n", byte_was_read);
+	printf("%d\n", nb_bytes_read);
+	//printf("%s\n", remainder);
+
 	return (0);
 }
 
@@ -131,6 +133,8 @@ int		main(void)
 	get_next_line(fd, &line);
 	printf("%s\n", line);
 	get_next_line(fd, &line);
+	printf("%s\n", line);
+	printf("%d\n", get_next_line(fd, &line));
 	printf("%s\n", line);
 
 	return (0);
