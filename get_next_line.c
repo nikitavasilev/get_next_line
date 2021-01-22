@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nvasilev <nvasilev@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/06 00:37:56 by nvasilev          #+#    #+#             */
-/*   Updated: 2021/01/16 21:01:39 by nvasilev         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -112,40 +100,61 @@ char	*ft_strchr(const char *s, int c)
 	return (0);
 }
 
-int		get_next_line(int fd, char **line)
+char	*check_remainder(char *remainder, char **line)
 {
-	char	buf[BUFFER_SIZE + 1];
-	int		nb_bytes_read;
 	char	*p_newline;
-	int		is_newline;
-	static char *remainder;
 
-	is_newline = 0;
+	p_newline = NULL;
 	if (remainder)
-		*line = ft_strdup(remainder);
+	{
+		if ((p_newline = ft_strchr(remainder, '\n')))
+		{
+			*p_newline = '\0';
+			*line = ft_strdup(remainder);
+			ft_strcpy(remainder, ++p_newline);
+		}
+		else
+		{
+			*line = ft_strdup(remainder);
+			ft_bzero(remainder, ft_strlen(remainder));
+		}
+	}
 	else
 	{
 		if (!(*line = malloc(1)))
 			return (0);
 		line[0][0] = '\0';
 	}
+	return (p_newline);
+}
 
-	while (!is_newline && (nb_bytes_read = read(fd, buf, BUFFER_SIZE)))
+int		get_next_line(int fd, char **line)
+{
+	static char	*remainder;
+	char		buf[BUFFER_SIZE + 1];
+	int			nb_bytes_read;
+	char		*p_newline;
+	char		*tmp;
+
+	if (!line || !BUFFER_SIZE)
+		return (-1);
+	p_newline = check_remainder(remainder, line);
+	while (!p_newline && (nb_bytes_read = read(fd, buf, BUFFER_SIZE)))
 	{
+		buf[nb_bytes_read] = '\0';
 		if ((p_newline = ft_strchr(buf, '\n')))
 		{
 			*p_newline = '\0';
-			is_newline = 1;
 			p_newline++;
 			remainder = ft_strdup(p_newline);
 		}
-		buf[nb_bytes_read] = '\0';
+		tmp = *line;
 		*line = ft_strjoin(*line, buf);
+		free(tmp);
 	}
-	printf("%d\n", nb_bytes_read);
-	//printf("%s\n", remainder);
-
-	return (0);
+	if (!nb_bytes_read)
+		free(remainder);
+	return (nb_bytes_read ? 1 : 0);
 }
 
 int		main(void)
@@ -160,9 +169,13 @@ int		main(void)
 	printf("%s\n", line);
 	printf("%d\n", get_next_line(fd, &line));
 	printf("%s\n", line);
+	printf("%d\n", get_next_line(fd, &line));
+	printf("%s\n", line);
+	printf("%d\n", get_next_line(fd, &line));
+	printf("%s\n", line);
+	// while (get_next_line(fd, &line))
+	// 	printf("%s\n", line);
 
-//	while (get_next_line(fd, &line))
-//		printf("%s\n", line);
 	free(line);
 
 	close(fd);
