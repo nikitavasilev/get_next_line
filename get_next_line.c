@@ -1,11 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nvasilev <nvasilev@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/01/22 14:34:10 by nvasilev          #+#    #+#             */
+/*   Updated: 2021/01/22 16:22:35 by nvasilev         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#ifndef BUFFER_SIZE
-# define BUFFER_SIZE 32
-#endif
+#include "get_next_line.h"
 
 size_t	ft_strlen(const char *s)
 {
@@ -138,6 +143,11 @@ int		get_next_line(int fd, char **line)
 
 	if (!line || !BUFFER_SIZE)
 		return (-1);
+	if (remainder && remainder[1] == '\n')
+	{
+		free(*line);
+		return (1);
+	}
 	p_newline = check_remainder(remainder, line);
 	while (!p_newline && (nb_bytes_read = read(fd, buf, BUFFER_SIZE)))
 	{
@@ -152,32 +162,7 @@ int		get_next_line(int fd, char **line)
 		*line = ft_strjoin(*line, buf);
 		free(tmp);
 	}
-	if (!nb_bytes_read)
-		free(remainder);
-	return (nb_bytes_read ? 1 : 0);
-}
-
-int		main(void)
-{
-	char	*line;
-	int		fd;
-
-	fd = open("file.txt", O_RDONLY);
-	printf("%d\n", get_next_line(fd, &line));
-	printf("%s\n", line);
-	printf("%d\n", get_next_line(fd, &line));
-	printf("%s\n", line);
-	printf("%d\n", get_next_line(fd, &line));
-	printf("%s\n", line);
-	printf("%d\n", get_next_line(fd, &line));
-	printf("%s\n", line);
-	printf("%d\n", get_next_line(fd, &line));
-	printf("%s\n", line);
-	// while (get_next_line(fd, &line))
-	// 	printf("%s\n", line);
-
-	free(line);
-
-	close(fd);
-	return (0);
+	// if (!ft_strlen(*line) && !nb_bytes_read)
+	// 	free(remainder);
+	return (nb_bytes_read || ft_strlen(remainder) || ft_strlen(*line) ? 1 : 0);
 }
