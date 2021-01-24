@@ -6,7 +6,7 @@
 /*   By: nvasilev <nvasilev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:34:10 by nvasilev          #+#    #+#             */
-/*   Updated: 2021/01/22 16:22:35 by nvasilev         ###   ########.fr       */
+/*   Updated: 2021/01/24 14:30:36 by nvasilev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,19 +108,25 @@ char	*ft_strchr(const char *s, int c)
 char	*check_remainder(char *remainder, char **line)
 {
 	char	*p_newline;
+	char	*tmp;
 
 	p_newline = NULL;
+	tmp = NULL;
 	if (remainder)
 	{
 		if ((p_newline = ft_strchr(remainder, '\n')))
 		{
 			*p_newline = '\0';
+			tmp = *line;
 			*line = ft_strdup(remainder);
+			free(tmp);
 			ft_strcpy(remainder, ++p_newline);
 		}
 		else
 		{
+			tmp = *line;
 			*line = ft_strdup(remainder);
+			free(tmp);
 			ft_bzero(remainder, ft_strlen(remainder));
 		}
 	}
@@ -137,32 +143,34 @@ int		get_next_line(int fd, char **line)
 {
 	static char	*remainder;
 	char		buf[BUFFER_SIZE + 1];
-	int			nb_bytes_read;
+	int			bytes_read;
 	char		*p_newline;
 	char		*tmp;
 
 	if (!line || !BUFFER_SIZE)
 		return (-1);
-	if (remainder && remainder[1] == '\n')
-	{
-		free(*line);
-		return (1);
-	}
+	// if (remainder && remainder[1] == '\n')
+	// {
+	// 	free(*line);
+	// 	return (1);
+	// }
 	p_newline = check_remainder(remainder, line);
-	while (!p_newline && (nb_bytes_read = read(fd, buf, BUFFER_SIZE)))
+	while (!p_newline && (bytes_read = read(fd, buf, BUFFER_SIZE)))
 	{
-		buf[nb_bytes_read] = '\0';
+		buf[bytes_read] = '\0';
 		if ((p_newline = ft_strchr(buf, '\n')))
 		{
 			*p_newline = '\0';
 			p_newline++;
+			tmp = remainder;
 			remainder = ft_strdup(p_newline);
+			free(tmp);
 		}
 		tmp = *line;
 		*line = ft_strjoin(*line, buf);
 		free(tmp);
 	}
-	// if (!ft_strlen(*line) && !nb_bytes_read)
-	// 	free(remainder);
-	return (nb_bytes_read || ft_strlen(remainder) || ft_strlen(*line) ? 1 : 0);
+	if (!ft_strlen(*line) && !bytes_read)
+		free(remainder);
+	return (bytes_read || ft_strlen(remainder) || ft_strlen(*line) ? 1 : 0);
 }
