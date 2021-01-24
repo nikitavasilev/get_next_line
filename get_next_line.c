@@ -6,7 +6,7 @@
 /*   By: nvasilev <nvasilev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:34:10 by nvasilev          #+#    #+#             */
-/*   Updated: 2021/01/24 14:30:36 by nvasilev         ###   ########.fr       */
+/*   Updated: 2021/01/24 14:52:40 by nvasilev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,25 +108,21 @@ char	*ft_strchr(const char *s, int c)
 char	*check_remainder(char *remainder, char **line)
 {
 	char	*p_newline;
-	char	*tmp;
 
 	p_newline = NULL;
-	tmp = NULL;
 	if (remainder)
 	{
 		if ((p_newline = ft_strchr(remainder, '\n')))
 		{
 			*p_newline = '\0';
-			tmp = *line;
+			free(*line);
 			*line = ft_strdup(remainder);
-			free(tmp);
 			ft_strcpy(remainder, ++p_newline);
 		}
 		else
 		{
-			tmp = *line;
+			free(*line);
 			*line = ft_strdup(remainder);
-			free(tmp);
 			ft_bzero(remainder, ft_strlen(remainder));
 		}
 	}
@@ -149,11 +145,6 @@ int		get_next_line(int fd, char **line)
 
 	if (!line || !BUFFER_SIZE)
 		return (-1);
-	// if (remainder && remainder[1] == '\n')
-	// {
-	// 	free(*line);
-	// 	return (1);
-	// }
 	p_newline = check_remainder(remainder, line);
 	while (!p_newline && (bytes_read = read(fd, buf, BUFFER_SIZE)))
 	{
@@ -162,9 +153,8 @@ int		get_next_line(int fd, char **line)
 		{
 			*p_newline = '\0';
 			p_newline++;
-			tmp = remainder;
+			free(remainder);
 			remainder = ft_strdup(p_newline);
-			free(tmp);
 		}
 		tmp = *line;
 		*line = ft_strjoin(*line, buf);
