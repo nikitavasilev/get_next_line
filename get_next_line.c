@@ -6,7 +6,7 @@
 /*   By: nvasilev <nvasilev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 14:34:10 by nvasilev          #+#    #+#             */
-/*   Updated: 2021/01/24 14:52:40 by nvasilev         ###   ########.fr       */
+/*   Updated: 2021/01/24 19:52:33 by nvasilev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,10 @@ char	*check_remainder(char *remainder, char **line)
 	{
 		if ((p_newline = ft_strchr(remainder, '\n')))
 		{
-			*p_newline = '\0';
+			if (*(++p_newline) == '\n')
+				*p_newline = '\0';
+			else
+				*(--p_newline) = '\0';
 			free(*line);
 			*line = ft_strdup(remainder);
 			ft_strcpy(remainder, ++p_newline);
@@ -143,6 +146,10 @@ int		get_next_line(int fd, char **line)
 	char		*p_newline;
 	char		*tmp;
 
+	tmp = NULL;
+	p_newline = NULL;
+	ft_bzero(buf, BUFFER_SIZE + 1);
+	bytes_read = 0;
 	if (!line || !BUFFER_SIZE)
 		return (-1);
 	p_newline = check_remainder(remainder, line);
@@ -152,9 +159,8 @@ int		get_next_line(int fd, char **line)
 		if ((p_newline = ft_strchr(buf, '\n')))
 		{
 			*p_newline = '\0';
-			p_newline++;
 			free(remainder);
-			remainder = ft_strdup(p_newline);
+			remainder = ft_strdup(++p_newline);
 		}
 		tmp = *line;
 		*line = ft_strjoin(*line, buf);
@@ -162,5 +168,5 @@ int		get_next_line(int fd, char **line)
 	}
 	if (!ft_strlen(*line) && !bytes_read)
 		free(remainder);
-	return (bytes_read || ft_strlen(remainder) || ft_strlen(*line) ? 1 : 0);
+	return (bytes_read || ft_strlen(*line) ? 1 : 0);
 }
